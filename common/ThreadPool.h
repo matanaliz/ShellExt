@@ -10,12 +10,25 @@ public:
 	ThreadPool(size_t);
 	~ThreadPool();
 
-	template<typename FN, class C>
-	void enqueue(FN fn, C c)
+	unsigned long GetResult();
+
+	template<typename FN, typename OBJ>
+	void enqueue(FN fn, OBJ o)
 	{
 		{
 			std::unique_lock<std::mutex> lock(m_mutex);
-			m_tasks.push_back(std::function<void()>(std::bind(fn, c)));
+			m_tasks.push_back(std::function<unsigned long()>(std::bind(fn, o)));
+		}
+
+		m_cond.notify_one();
+	}
+
+	template<typename FN, typename OBJ>
+	void enqueue(FN fn, OBJ o, const unsigned char* buf, size_t size)
+	{
+		{
+			std::unique_lock<std::mutex> lock(m_mutex);
+			m_tasks.push_back(std::function<unsigned long()>(std::bind(fn, o, buf, size)));
 		}
 
 		m_cond.notify_one();
@@ -36,7 +49,8 @@ private:
 
 	std::mutex m_mutex;
 	std::vector<std::thread> m_workers;
-	std::deque<std::function<void()>> m_tasks;
+	std::deque<std::function<unsigned long()>> m_tasks;
 	std::condition_variable m_cond;
-	bool stop;
+	bool m_stop;
+	unsigned long m_result;
 };

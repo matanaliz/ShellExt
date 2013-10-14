@@ -15,9 +15,9 @@ File::File(const std::wstring& path) : m_impl(0)
 	}
 }
 
-void File::LogInfo()
+unsigned long File::LogInfo()
 {
-	m_impl->LogInfo();
+	return m_impl->LogInfo();
 }
 
 File::~File()

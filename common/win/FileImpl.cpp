@@ -1,7 +1,9 @@
-#include <Logger.h>
-#include "FileImpl.h"
 #include <sstream>
 #include <fstream>
+#include <Logger.h>
+#include <ThreadPool.h>
+#include "FileImpl.h"
+
 
 FileImpl::FileImpl(const std::wstring& path) 
 	: m_filePath(path)
@@ -16,10 +18,10 @@ FileImpl::~FileImpl()
 {
 }
 
-DWORD FileImpl::computeSum()
+unsigned long FileImpl::computeSum()
 {
 	//Probably, I need to use WINAPI for asyc file reading
-	DWORD sum = 0;
+	unsigned long sum = 0;
 	std::fstream fstr;
 	fstr.open(m_filePath.c_str(), std::fstream::in | std::fstream::binary);
 	if (fstr.is_open())
@@ -28,7 +30,7 @@ DWORD FileImpl::computeSum()
 		{
 			char c;
 			fstr.get(c);
-			sum += static_cast<DWORD>(c);
+			sum += static_cast<unsigned long>(c);
 		}
 		fstr.close();
 	}
@@ -36,7 +38,15 @@ DWORD FileImpl::computeSum()
 	return sum;
 }
 
-void FileImpl::LogInfo()
+unsigned long FileImpl::computeSumBuf(const unsigned char* buf, size_t size)
+{
+	unsigned long sum = 0;
+	for (size_t i = 0; i < size; ++i)
+		sum += *buf++;
+	return sum;
+}
+
+unsigned long FileImpl::LogInfo()
 {
 	std::wstringstream wss;
 	std::wstring spc(L"\t");
@@ -46,8 +56,19 @@ void FileImpl::LogInfo()
 	wss.write(spc.c_str(), spc.size());
 	wss.write(m_fileSize.c_str(), m_fileSize.size());
 	wss.write(spc.c_str(), spc.size());
+
+	//Sum count thread pool test
+	//TODO: opend file by parts and feed to computeSumBuf
+	ThreadPool tp(ThreadPool::THREAD_NUMBER);
+	unsigned char a[3] = { 0, 1, 2 };
+	tp.enqueue(&FileImpl::computeSumBuf, this, &a[0], 3);
+	tp.GetResult();
+
+	//computeSum is way too slow
 	wss << std::to_wstring(computeSum());
 	Logger::GetInstance()->LogIt(wss.str());
+
+	return 0;
 }
 
 void FileImpl::prepareInfo()

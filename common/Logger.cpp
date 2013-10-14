@@ -25,8 +25,9 @@ Logger* Logger::GetInstance()
 
 void Logger::LogIt(const std::wstring& str)
 {
+	//TODO: formated output
+	//      sorted log
 	std::wfstream fstr;
-	//fstr.unsetf(std::wfstream::skipws);
 	std::lock_guard<std::mutex> lock(m_mutex);
 	fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
 	if (fstr.is_open())

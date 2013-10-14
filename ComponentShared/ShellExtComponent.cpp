@@ -145,11 +145,17 @@ IFACEMETHODIMP ShellExtComponent::QueryContextMenu(
 IFACEMETHODIMP ShellExtComponent::InvokeCommand( 
             CMINVOKECOMMANDINFO *pici)
 {
+
 	ThreadPool tp(ThreadPool::THREAD_NUMBER);
 	for(auto& it : m_filesVec)
 	{
 		tp.enqueue(&File::LogInfo, it.get());
 	}
+
+	std::wstring str(L"Logging, file count: ");
+	str.append(std::to_wstring(m_filesVec.size()));
+	MessageBox(NULL, str.c_str(), L"Logging", 0);
+	tp.GetResult();
 
 	return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
 }

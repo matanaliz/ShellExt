@@ -8,7 +8,7 @@ public:
 	File(const std::wstring& path);
 	~File();
 
-	void LogInfo();
+	unsigned long LogInfo();
 
 	const std::wstring& Date();
 	const std::wstring& Size();

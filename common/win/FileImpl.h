@@ -8,7 +8,7 @@ public:
 	FileImpl(const std::wstring& path);
 	~FileImpl();
 
-	void LogInfo();
+	unsigned long LogInfo();
 
 	const std::wstring& Date() const { return m_fileDate; }
 	const std::wstring& Size() const { return m_fileSize; }
@@ -18,7 +18,8 @@ public:
 private:
 
 	void prepareInfo();
-	DWORD computeSum();
+	unsigned long computeSum();
+	unsigned long computeSumBuf(const unsigned char* buf, size_t size);
 
 	std::wstring m_filePath;
 	std::wstring m_fileDate;
