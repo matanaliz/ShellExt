@@ -3,16 +3,17 @@
 #include <Shlwapi.h>
 #include <strsafe.h>
 #include <string>
-#include <sstream>
 #include <fstream>
 #include <iostream>
+
+#include "Logger.h"
+
 #pragma comment(lib, "shlwapi.lib")
 
 extern HINSTANCE g_hInst;
 extern long g_cDllRef;
 
-ShellExtComponent::ShellExtComponent() : m_cRef(1), 
-    pszPageTitle(L"CppShellExtProp")
+ShellExtComponent::ShellExtComponent() : m_cRef(1)
 {
     InterlockedIncrement(&g_cDllRef);
 }
@@ -20,11 +21,6 @@ ShellExtComponent::ShellExtComponent() : m_cRef(1),
 ShellExtComponent::~ShellExtComponent()
 {
     InterlockedDecrement(&g_cDllRef);
-}
-
-PCWSTR ShellExtComponent::GetSelectedFile()
-{
-    return this->m_szSelectedFile;
 }
 
 #pragma region IUnknown
@@ -90,15 +86,21 @@ IFACEMETHODIMP ShellExtComponent::Initialize(
             // code sample displays the custom context menu item when only 
             // one file is selected. 
             UINT nFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
-			std::wstring s = std::to_wstring(nFiles);
-			MessageBox(NULL, s.c_str(), NULL, MB_OK);
 			for (UINT i = 0; i < nFiles;  i++)
 			{
-				std::shared_ptr<wchar_t> filePath(new wchar_t[MAX_PATH], deleter<wchar_t>());
-				DragQueryFile(hDrop, i, filePath.get(), 
-                    MAX_PATH);
+				try
+				{
+					std::shared_ptr<wchar_t> filePath(new wchar_t[MAX_PATH], deleter<wchar_t>());
+					DragQueryFile(hDrop, i, filePath.get(), 
+									MAX_PATH);
 
-				m_filesVec.push_back(filePath);
+					m_filesVec.push_back(filePath);
+				}
+				catch (const std::exception& e)
+				{
+					std::cerr << "ShellExtComponent::Initialize " << e.what() << std::endl;
+				}
+
 			}
 			hr = S_OK;
 
@@ -125,8 +127,6 @@ IFACEMETHODIMP ShellExtComponent::QueryContextMenu(
             _In_  UINT idCmdLast,
             _In_  UINT uFlags)
 {
-	HRESULT hr;
-	
     if(!(CMF_DEFAULTONLY & uFlags))
     {
         InsertMenu(hMenu, 
@@ -144,15 +144,12 @@ IFACEMETHODIMP ShellExtComponent::QueryContextMenu(
 IFACEMETHODIMP ShellExtComponent::InvokeCommand( 
             CMINVOKECOMMANDINFO *pici)
 {
-	std::wfstream fstr;
-	fstr.open("E:\\log.txt", std::fstream::out | std::fstream::app);
-
 	for (VectorShared::iterator it = m_filesVec.begin(), e = m_filesVec.end(); it != e; ++it)
 	{
-		fstr << (*it).get() << std::endl;
+		Logger::GetInstance()->LogIt((*it).get());
 	}
 
-	return 0;
+	return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
 }
 
 IFACEMETHODIMP ShellExtComponent::GetCommandString( 
@@ -163,7 +160,7 @@ IFACEMETHODIMP ShellExtComponent::GetCommandString(
 			UINT cchMax)
 {
 
-	return 0;
+	return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
 }
 
 #pragma endregion

@@ -30,7 +30,6 @@ public:
 	IFACEMETHODIMP GetCommandString(UINT_PTR, UINT, UINT*, CHAR*, UINT);
 
 	ShellExtComponent();
-	PCWSTR GetSelectedFile();
 
 protected:
 
@@ -40,14 +39,7 @@ private:
     // Reference count of component.
     long m_cRef;
 
-    // The name of the selected file.
-    wchar_t m_szSelectedFile[MAX_PATH];
 	typedef std::shared_ptr<wchar_t> SharedArray;
 	typedef std::vector<SharedArray> VectorShared;
 	VectorShared m_filesVec;
-
-    // Property sheet page title.
-    PCWSTR pszPageTitle;
-	LPCTSTR  m_pszVerb;
-	LPCTSTR m_pwszVerb;
 };
