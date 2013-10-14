@@ -6,9 +6,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "Logger.h"
-#include <File.h>
-#include "ThreadPool.h"
+
+#include <ThreadPool.h>
 
 #pragma comment(lib, "shlwapi.lib")
 
@@ -96,7 +95,7 @@ IFACEMETHODIMP ShellExtComponent::Initialize(
 					DragQueryFile(hDrop, i, filePath.get(), 
 									MAX_PATH);
 
-					m_filesVec.push_back(filePath);
+					m_filesVec.push_back(FilePtr(new File(filePath.get())));
 				}
 				catch (const std::exception& e)
 				{
@@ -149,12 +148,7 @@ IFACEMETHODIMP ShellExtComponent::InvokeCommand(
 	ThreadPool tp(ThreadPool::THREAD_NUMBER);
 	for(auto& it : m_filesVec)
 	{
-		//!!!MEMLEAK
-
-		//In test purposes
-		MessageBox(NULL, it.get(), NULL, 0);
-		File* f = new File(it.get());
-		tp.enqueue(&File::LogInfo, f);
+		tp.enqueue(&File::LogInfo, it.get());
 	}
 
 	return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));

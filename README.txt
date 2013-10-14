@@ -10,11 +10,12 @@
 #Known issues:
 1. Not work if drag folders too
 2. Thread pool stragne behaviour { logging n-1 files to log }
+3. Not working on special symbols like: trademark, copyright 
+4. File format alignment
 
 
 #TODO
 1. Add file information
 2. Compute check sum
-3. Threading
-4. Log file sort
-5. Unittests
+3. Log file sort
+4. Unittests

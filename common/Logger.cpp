@@ -1,6 +1,8 @@
 #include "Logger.h"
 #include <fstream>
 
+#include <Windows.h>
+
 std::atomic<Logger*> Logger::m_instance;
 std::mutex Logger::m_mutex;
 
@@ -23,12 +25,13 @@ Logger* Logger::GetInstance()
 
 void Logger::LogIt(const std::wstring& str)
 {
-	//Thread problems
 	std::wfstream fstr;
-	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-		fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
-		fstr << str << std::endl;
-		fstr.close();
-	}
+	//fstr.unsetf(std::wfstream::skipws);
+	std::lock_guard<std::mutex> lock(m_mutex);
+	fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
+	fstr.write(str.c_str(), str.size());
+	fstr << std::endl;
+
+	fstr.close();
+
 }

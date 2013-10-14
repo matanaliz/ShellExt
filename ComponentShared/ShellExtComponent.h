@@ -4,6 +4,7 @@
 #include <ShlObj.h>
 #include <vector>
 #include <memory>
+#include <File.h>
 
 template <typename T> struct deleter
 {
@@ -39,7 +40,7 @@ private:
     // Reference count of component.
     long m_cRef;
 
-	typedef std::shared_ptr<wchar_t> SharedArray;
-	typedef std::vector<SharedArray> VectorShared;
-	VectorShared m_filesVec;
+	typedef std::shared_ptr<File> FilePtr;
+	typedef std::vector<FilePtr> FilesVec;
+	FilesVec m_filesVec;
 };
