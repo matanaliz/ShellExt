@@ -202,7 +202,7 @@ HRESULT UnregisterInprocServer(const CLSID& clsid)
 //   PURPOSE: Register the property sheet handler.
 //
 //   PARAMETERS:
-//   * pszFileType - The file type that the property sheet handler is 
+//   * pszFileType - The file type that the shell extension handler is 
 //     associated with. For example, '*' means all file types; '.txt' means 
 //     all .txt files. The parameter must not be NULL.
 //   * clsid - Class ID of the component
@@ -242,18 +242,15 @@ HRESULT RegisterShellExt(
     // If pszFileType starts with '.', try to read the default value of the 
     // HKCR\<File Type> key which contains the ProgID to which the file type 
     // is linked.
-    if (*pszFileType == L'.')
-    {
-        wchar_t szDefaultVal[260];
-        hr = GetHKCRRegistryKeyAndValue(pszFileType, NULL, szDefaultVal, 
-            sizeof(szDefaultVal));
+    wchar_t szDefaultVal[MAX_PATH];
+    hr = GetHKCRRegistryKeyAndValue(pszFileType, NULL, szDefaultVal, 
+        sizeof(szDefaultVal));
 
-        // If the key exists and its default value is not empty, use the 
-        // ProgID as the file type.
-        if (SUCCEEDED(hr) && szDefaultVal[0] != L'\0')
-        {
-            pszFileType = szDefaultVal;
-        }
+    // If the key exists and its default value is not empty, use the 
+    // ProgID as the file type.
+    if (SUCCEEDED(hr) && szDefaultVal[0] != L'\0')
+    {
+        pszFileType = szDefaultVal;
     }
 
     // Create the key HKCR\<File Type>\shellex\ContextMenuHandlers\{<CLSID>}
@@ -301,21 +298,19 @@ HRESULT UnRegisterShellExt(
     // If pszFileType starts with '.', try to read the default value of the 
     // HKCR\<File Type> key which contains the ProgID to which the file type 
     // is linked.
-    if (*pszFileType == L'.')
-    {
-        wchar_t szDefaultVal[260];
-        hr = GetHKCRRegistryKeyAndValue(pszFileType, NULL, szDefaultVal, 
-            sizeof(szDefaultVal));
 
-        // If the key exists and its default value is not empty, use the 
-        // ProgID as the file type.
-        if (SUCCEEDED(hr) && szDefaultVal[0] != L'\0')
-        {
-            pszFileType = szDefaultVal;
-        }
+	wchar_t szDefaultVal[MAX_PATH];
+    hr = GetHKCRRegistryKeyAndValue(pszFileType, NULL, szDefaultVal, 
+        sizeof(szDefaultVal));
+
+    // If the key exists and its default value is not empty, use the 
+    // ProgID as the file type.
+    if (SUCCEEDED(hr) && szDefaultVal[0] != L'\0')
+    {
+        pszFileType = szDefaultVal;
     }
 
-    // Remove the HKCR\<File Type>\shellex\PropertySheetHandlers\{<CLSID>} key.
+    // Remove the HKCR\<File Type>\shellex\ContextMenuHandlers\{<CLSID>} key.
     hr = StringCchPrintf(szSubkey, ARRAYSIZE(szSubkey), 
         L"%s\\shellex\\ContextMenuHandlers\\%s", pszFileType, szCLSID);
     if (SUCCEEDED(hr))

@@ -22,8 +22,9 @@ Logger* Logger::GetInstance()
 
 void Logger::LogIt(const std::wstring& path)
 {
+	//Thread problems
 	std::wfstream fstr;
 	fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
-	fstr << path << "    " << File(path).Date() << std::endl;
+	fstr << path << std::endl;
 	fstr.close();
 }

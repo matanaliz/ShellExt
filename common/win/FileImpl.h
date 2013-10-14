@@ -8,9 +8,12 @@ public:
 	FileImpl(const std::wstring& path);
 	~FileImpl();
 
-	const std::wstring& Date() const;
-	const std::wstring& Size() const;
-	const std::wstring& Name() const;
+	void LogInfo();
+
+	const std::wstring& Date() const { return m_fileDate; }
+	const std::wstring& Size() const { return m_fileSize; }
+	const std::wstring& Name() const { return m_fileName; }
+	const std::wstring& Path() const { return m_filePath; }
 
 private:
 

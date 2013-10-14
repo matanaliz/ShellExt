@@ -1,4 +1,6 @@
 #include "FileImpl.h"
+//Change
+#include "../../ComponentShared/Logger.h"
 
 
 FileImpl::FileImpl(const std::wstring& path) 
@@ -12,7 +14,7 @@ FileImpl::FileImpl(const std::wstring& path)
 
 	//if(m_fileHandle != INVALID_HANDLE_VALUE)
 	//{
-		prepareInfo();
+		//prepareInfo();
 	//}
 	//else
 	//{
@@ -22,22 +24,15 @@ FileImpl::FileImpl(const std::wstring& path)
 
 FileImpl::~FileImpl()
 {
-	CloseHandle(m_fileHandle);
+	//CloseHandle(m_fileHandle);
 }
 
-const std::wstring& FileImpl::Date() const
+void FileImpl::LogInfo()
 {
-	return m_fileDate;
-}
-
-const std::wstring& FileImpl::Size() const
-{
-	return m_fileSize;
-}
-
-const std::wstring& FileImpl::Name() const
-{
-	return m_fileName;
+	//TODO 
+	//CHecksum
+	//async log
+	Logger::GetInstance()->LogIt(m_filePath);
 }
 
 void FileImpl::prepareInfo()

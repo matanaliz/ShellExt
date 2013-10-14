@@ -15,6 +15,11 @@ File::File(const std::wstring& path) : m_impl(0)
 	}
 }
 
+void File::LogInfo()
+{
+	m_impl->LogInfo();
+}
+
 File::~File()
 {
 	delete m_impl;
@@ -33,4 +38,9 @@ const std::wstring& File::Size()
 const std::wstring& File::Name()
 {
 	return m_impl->Name();
+}
+
+const std::wstring& File::Path()
+{
+	return m_impl->Path();
 }

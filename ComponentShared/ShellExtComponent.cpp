@@ -7,6 +7,8 @@
 #include <iostream>
 
 #include "Logger.h"
+#include <File.h>
+#include "ThreadPool.h"
 
 #pragma comment(lib, "shlwapi.lib")
 
@@ -140,13 +142,16 @@ IFACEMETHODIMP ShellExtComponent::QueryContextMenu(
 
     return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
 }
-        
+
 IFACEMETHODIMP ShellExtComponent::InvokeCommand( 
             CMINVOKECOMMANDINFO *pici)
 {
-	for (VectorShared::iterator it = m_filesVec.begin(), e = m_filesVec.end(); it != e; ++it)
+	ThreadPool tp(ThreadPool::THREAD_NUMBER);
+	for(auto& it : m_filesVec)
 	{
-		Logger::GetInstance()->LogIt((*it).get());
+		//!!!MEMLEAK
+		File* f = new File(it.get());
+		tp.enqueue(&File::LogInfo, f);
 	}
 
 	return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));

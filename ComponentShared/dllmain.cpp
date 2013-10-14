@@ -1,5 +1,4 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
-//#include "stdafx.h"
 #include <windows.h>
 #include <Guiddef.h>
 #include "ClassFactory.h"
@@ -80,7 +79,7 @@ STDAPI DllCanUnloadNow(void)
 //
 //   FUNCTION: DllRegisterServer
 //
-//   PURPOSE: Register the COM server and the property sheet handler.
+//   PURPOSE: Register the COM server and the shell extension handler.
 // 
 STDAPI DllRegisterServer(void)
 {
@@ -100,7 +99,7 @@ STDAPI DllRegisterServer(void)
     if (SUCCEEDED(hr))
     {
         // Register the shell extension component. The shell extension component is 
-        // associated with the .cpp file class.
+        // associated with the * file class.
         hr = RegisterShellExt(L"*", 
 			CLSID_ShellExt, 
             L"CppShellExtProp.ShellExtComponent");
@@ -112,7 +111,7 @@ STDAPI DllRegisterServer(void)
 //
 //   FUNCTION: DllUnregisterServer
 //
-//   PURPOSE: Unregister the COM server and the property sheet handler.
+//   PURPOSE: Unregister the COM server and the shell extension handler.
 // 
 STDAPI DllUnregisterServer(void)
 {
@@ -129,8 +128,7 @@ STDAPI DllUnregisterServer(void)
     hr = UnregisterInprocServer(CLSID_ShellExt);
     if (SUCCEEDED(hr))
     {
-        // Unregister the property sheet handler.
-        hr = UnRegisterShellExt(L".cpp", 
+        hr = UnRegisterShellExt(L"*", 
             CLSID_ShellExt);
     }
 

@@ -8,8 +8,8 @@
 
 
 #Known issues:
-1. Error on unregister
-2. Not work if drag folders too
+1. Not work if drag folders too
+2. Thread pool stragne behaviour { logging n-1 files to log }
 
 
 #TODO
