@@ -150,6 +150,9 @@ IFACEMETHODIMP ShellExtComponent::InvokeCommand(
 	for(auto& it : m_filesVec)
 	{
 		//!!!MEMLEAK
+
+		//In test purposes
+		MessageBox(NULL, it.get(), NULL, 0);
 		File* f = new File(it.get());
 		tp.enqueue(&File::LogInfo, f);
 	}

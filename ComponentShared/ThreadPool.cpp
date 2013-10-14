@@ -13,7 +13,7 @@ void ThreadPool::Worker::operator()()
 				m_pool.m_cond.wait(lock);
 			}
 
-			if (m_pool.stop)
+			if (m_pool.stop && m_pool.m_tasks.empty())
 				return;
 
 			task = m_pool.m_tasks.front();

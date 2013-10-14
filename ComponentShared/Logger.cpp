@@ -8,7 +8,8 @@ Logger* Logger::GetInstance()
 {
 	Logger* tmp = m_instance.load(std::memory_order_relaxed);
     std::atomic_thread_fence(std::memory_order_acquire);
-    if (tmp == nullptr) {
+    if (tmp == nullptr) 
+	{
         std::lock_guard<std::mutex> lock(m_mutex);
         tmp = m_instance.load(std::memory_order_relaxed);
         if (tmp == nullptr) {
@@ -20,11 +21,14 @@ Logger* Logger::GetInstance()
     return tmp;
 }
 
-void Logger::LogIt(const std::wstring& path)
+void Logger::LogIt(const std::wstring& str)
 {
 	//Thread problems
 	std::wfstream fstr;
-	fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
-	fstr << path << std::endl;
-	fstr.close();
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
+		fstr << str << std::endl;
+		fstr.close();
+	}
 }
