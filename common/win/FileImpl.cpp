@@ -1,6 +1,7 @@
 #include <Logger.h>
 #include "FileImpl.h"
 #include <sstream>
+#include <fstream>
 
 FileImpl::FileImpl(const std::wstring& path) 
 	: m_filePath(path)
@@ -8,36 +9,44 @@ FileImpl::FileImpl(const std::wstring& path)
 	, m_fileSize(L"")
 	, m_fileName(L"")
 {
-	//m_fileHandle = CreateFile(m_filePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
- //       OPEN_EXISTING, 0, NULL);
-
-	//if(m_fileHandle != INVALID_HANDLE_VALUE)
-	//{
 	prepareInfo();
-	//}
-	//else
-	//{
-	//	throw std::invalid_argument("Cannot open file");
-	//}
 }
 
 FileImpl::~FileImpl()
 {
-	//CloseHandle(m_fileHandle);
+}
+
+DWORD FileImpl::computeSum()
+{
+	//Probably, I need to use WINAPI for asyc file reading
+	DWORD sum = 0;
+	std::fstream fstr;
+	fstr.open(m_filePath.c_str(), std::fstream::in | std::fstream::binary);
+	if (fstr.is_open())
+	{
+		while (!fstr.eof() && fstr.good())
+		{
+			char c;
+			fstr.get(c);
+			sum += static_cast<DWORD>(c);
+		}
+		fstr.close();
+	}
+
+	return sum;
 }
 
 void FileImpl::LogInfo()
 {
-	//TODO 
-	//CHecksum
-	//async log
 	std::wstringstream wss;
-	std::wstring spc(L"    ");
+	std::wstring spc(L"\t");
 	wss.write(m_filePath.c_str(), m_filePath.size());
 	wss.write(spc.c_str(), spc.size());
 	wss.write(m_fileDate.c_str(), m_fileDate.size());
 	wss.write(spc.c_str(), spc.size());
 	wss.write(m_fileSize.c_str(), m_fileSize.size());
+	wss.write(spc.c_str(), spc.size());
+	wss << std::to_wstring(computeSum());
 	Logger::GetInstance()->LogIt(wss.str());
 }
 
@@ -69,7 +78,7 @@ void FileImpl::prepareInfo()
 
 	std::wstring date;
 	date.resize(20, 0);
-	res = GetDateFormat(LOCALE_USER_DEFAULT, NULL, &lSystemTime, L"dd','MM','yyyy", &date[0], 20);
+	res = GetDateFormat(LOCALE_USER_DEFAULT, NULL, &lSystemTime, L"dd'.'MM'.'yyyy", &date[0], 20);
 	if (0 == res)
 	{
 		MessageBox(NULL, std::to_wstring(GetLastError()).c_str(), L"GetDateFormat Error", 0);

@@ -29,9 +29,11 @@ void Logger::LogIt(const std::wstring& str)
 	//fstr.unsetf(std::wfstream::skipws);
 	std::lock_guard<std::mutex> lock(m_mutex);
 	fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
-	fstr.write(str.c_str(), str.size());
-	fstr << std::endl;
-
-	fstr.close();
-
+	if (fstr.is_open())
+	{
+		//Something wrong with operator<< and whitespaces, noskipws not helping
+		fstr.write(str.c_str(), str.size());
+		fstr << std::endl;
+		fstr.close();
+	}
 }

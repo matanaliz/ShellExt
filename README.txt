@@ -12,10 +12,9 @@
 2. Thread pool stragne behaviour { logging n-1 files to log }
 3. Not working on special symbols like: trademark, copyright 
 4. File format alignment
+5. Unstable on big amount of files
 
 
 #TODO
-1. Add file information
-2. Compute check sum
-3. Log file sort
-4. Unittests
+1. Log file sort
+2. Unittests

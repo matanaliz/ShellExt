@@ -18,6 +18,7 @@ public:
 private:
 
 	void prepareInfo();
+	DWORD computeSum();
 
 	std::wstring m_filePath;
 	std::wstring m_fileDate;
