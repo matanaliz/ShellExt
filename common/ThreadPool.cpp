@@ -20,6 +20,7 @@ void ThreadPool::Worker::operator()()
 			m_pool.m_tasks.pop_front();
 		}
 
+		std::unique_lock<std::mutex> lock(m_pool.m_mutex);
 		m_pool.m_result += task();
 	}
 }

@@ -9,12 +9,10 @@
 
 #Known issues:
 1. Not work if drag folders too
-2. Thread pool stragne behaviour { logging n-1 files to log }
-3. Not working on special symbols like: trademark, copyright 
-4. File format alignment
-5. Unstable on big amount of files
-6. Need to restart explorer for rebuild dll
-7. Hang on big files (slow checksum computing)
+2. Not working on special symbols like: trademark, copyright 
+3. File format alignment
+4. Need to restart explorer for rebuild dll
+5. Hang on big files (slow checksum computing)
 
 
 #TODO
@@ -22,3 +20,4 @@
 2. Unittests
 3. Fix it
 4. Use ThreadPool for checksum computing!
+5. Redesign FileImpl class (common checksum computing move to File)

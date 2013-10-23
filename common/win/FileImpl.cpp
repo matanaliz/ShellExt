@@ -59,10 +59,12 @@ unsigned long FileImpl::LogInfo()
 
 	//Sum count thread pool test
 	//TODO: opend file by parts and feed to computeSumBuf
-	ThreadPool tp(ThreadPool::THREAD_NUMBER);
-	unsigned char a[3] = { 0, 1, 2 };
-	tp.enqueue(&FileImpl::computeSumBuf, this, &a[0], 3);
-	tp.GetResult();
+
+	//ThreadPool check
+	//ThreadPool tp(ThreadPool::THREAD_NUMBER);
+	//unsigned char a[3] = { 0, 1, 2 };
+	//tp.enqueue(&FileImpl::computeSumBuf, this, &a[0], 3);
+	//tp.GetResult();
 
 	//computeSum is way too slow
 	wss << std::to_wstring(computeSum());
@@ -81,10 +83,10 @@ void FileImpl::prepareInfo()
 		MessageBox(NULL, std::to_wstring(GetLastError()).c_str(), L"GetFileAttributesEx Error", 0);
 	}
 
-	ULONG fileSize = (static_cast<ULONGLONG>(lpFileInformation.nFileSizeHigh) <<
+	ULONGLONG fileSize = (static_cast<ULONGLONG>(lpFileInformation.nFileSizeHigh) <<
                       sizeof(lpFileInformation.nFileSizeLow) * 8) |
                      lpFileInformation.nFileSizeLow;
-	ULONG fileSizeKB = (fileSize / 1024) == 0 ? 1 : fileSize / 1024;
+	ULONGLONG fileSizeKB = (fileSize / 1024) == 0 ? 1 : fileSize / 1024;
 	m_fileSize = std::to_wstring(fileSizeKB);
 	m_fileSize.append(L" KB");
 	

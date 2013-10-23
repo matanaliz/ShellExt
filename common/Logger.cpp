@@ -1,40 +1,37 @@
 #include "Logger.h"
-#include <fstream>
-
-#include <Windows.h>
 
 std::atomic<Logger*> Logger::m_instance;
 std::mutex Logger::m_mutex;
 
+Logger::Logger()
+{
+	m_logFile.open(k_logPath.c_str(), std::fstream::out | std::fstream::app);
+}
+
+Logger::~Logger()
+{
+	if (m_logFile.is_open())
+		m_logFile.close();
+}
+
 Logger* Logger::GetInstance()
 {
-	Logger* tmp = m_instance.load(std::memory_order_relaxed);
-    std::atomic_thread_fence(std::memory_order_acquire);
-    if (tmp == nullptr) 
-	{
-        std::lock_guard<std::mutex> lock(m_mutex);
-        tmp = m_instance.load(std::memory_order_relaxed);
-        if (tmp == nullptr) {
-            tmp = new Logger;
-            std::atomic_thread_fence(std::memory_order_release);
-            m_instance.store(tmp, std::memory_order_relaxed);
-        }
-    }
-    return tmp;
+	//Threadsafe in C++11
+	static Logger instance;
+    return &instance;
 }
 
 void Logger::LogIt(const std::wstring& str)
 {
 	//TODO: formated output
 	//      sorted log
-	std::wfstream fstr;
 	std::lock_guard<std::mutex> lock(m_mutex);
-	fstr.open(LOG_PATH, std::fstream::out | std::fstream::app);
-	if (fstr.is_open())
+
+	if (m_logFile.is_open())
 	{
 		//Something wrong with operator<< and whitespaces, noskipws not helping
-		fstr.write(str.c_str(), str.size());
-		fstr << std::endl;
-		fstr.close();
+		//TODO: Try check for '\0' in string
+		m_logFile.write(str.c_str(), str.size());
+		m_logFile << std::endl;
 	}
 }

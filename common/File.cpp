@@ -25,22 +25,22 @@ File::~File()
 	delete m_impl;
 }
 
-const std::wstring& File::Date()
+const std::wstring& File::Date() const
 {
 	return m_impl->Date();
 }
 
-const std::wstring& File::Size()
+const std::wstring& File::Size() const
 {
 	return m_impl->Size();
 }
 
-const std::wstring& File::Name()
+const std::wstring& File::Name() const
 {
 	return m_impl->Name();
 }
 
-const std::wstring& File::Path()
+const std::wstring& File::Path() const
 {
 	return m_impl->Path();
 }

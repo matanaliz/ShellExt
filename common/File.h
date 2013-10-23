@@ -10,10 +10,10 @@ public:
 
 	unsigned long LogInfo();
 
-	const std::wstring& Date();
-	const std::wstring& Size();
-	const std::wstring& Name();
-	const std::wstring& Path();
+	const std::wstring& Date() const;
+	const std::wstring& Size() const;
+	const std::wstring& Name() const;
+	const std::wstring& Path() const;
 
 private:
 	FileImpl* m_impl;
