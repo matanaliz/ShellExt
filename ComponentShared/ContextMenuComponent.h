@@ -6,15 +6,9 @@
 #include <memory>
 #include <File.h>
 
-template <typename T> struct deleter
-{
-	void operator() (T* ptr)
-	{
-		delete[] ptr;
-	}
-};
+static const wchar_t* kContextMenuItemName = L"&Log it!";
 
-class ShellExtComponent : public IShellExtInit, public IContextMenu
+class ContextMenuComponent : public IShellExtInit, public IContextMenu
 {
 public:
 	// IUnknown
@@ -30,17 +24,16 @@ public:
 	IFACEMETHODIMP InvokeCommand(CMINVOKECOMMANDINFO* pici);
 	IFACEMETHODIMP GetCommandString(UINT_PTR, UINT, UINT*, CHAR*, UINT);
 
-	ShellExtComponent();
+	ContextMenuComponent();
 
 protected:
-
-	~ShellExtComponent();
+	~ContextMenuComponent();
 
 private:
     // Reference count of component.
     long m_cRef;
 
-	typedef std::shared_ptr<File> FilePtr;
-	typedef std::vector<FilePtr> FilesVec;
-	FilesVec m_filesVec;
+	std::vector<std::wstring> m_files;
+
+	int HandleLogCommand();
 };

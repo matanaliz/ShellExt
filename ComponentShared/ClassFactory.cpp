@@ -1,5 +1,18 @@
+/****************************** Module Header ******************************\
+Module Name:  ClassFactory.cpp
+Project:      CppShellExtProp
+Copyright (c) Microsoft Corporation.
+The file implements the class factory for the ContextMenuExt COM class.
+This source is subject to the Microsoft Public License.
+See http://www.microsoft.com/opensource/licenses.mspx#Ms-PL.
+All other rights reserved.
+THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
+\***************************************************************************/
+
 #include "ClassFactory.h"
-#include "ShellExtComponent.h"
+#include "ContextMenuComponent.h"
 #include <Shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
@@ -55,7 +68,7 @@ IFACEMETHODIMP ClassFactory::CreateInstance(IUnknown *pUnkOuter, REFIID riid, vo
         hr = E_OUTOFMEMORY;
 
         // Create the COM component.
-        ShellExtComponent *pExt = new ShellExtComponent();
+        ContextMenuComponent *pExt = new (std::nothrow) ContextMenuComponent();
         if (pExt)
         {
             // Query the specified interface.

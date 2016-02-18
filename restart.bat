@@ -1,3 +1,4 @@
+set currPath=%~dp0
 taskkill /f /im explorer.exe
-explorer
+explorer %currPath%
 exit

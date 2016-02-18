@@ -15,31 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Reg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShellExtComponent.h">
+    <ClInclude Include="..\core\File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\win\FileImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\core\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ClassFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\win\FileImpl.h">
+    <ClInclude Include="ContextMenuComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\File.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ThreadPool.h">
+    <ClInclude Include="..\core\MainApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,22 +47,25 @@
     <ClCompile Include="Reg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShellExtComponent.cpp">
+    <ClCompile Include="..\core\File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\win\FileImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\core\ThreadPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClassFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\win\FileImpl.cpp">
+    <ClCompile Include="ContextMenuComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\File.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\Logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\ThreadPool.cpp">
+    <ClCompile Include="..\core\MainApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

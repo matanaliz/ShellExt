@@ -1,4 +1,4 @@
-#include "ShellExtComponent.h"
+#include "ContextMenuComponent.h"
 #include <Windows.h>
 #include <Shlwapi.h>
 #include <strsafe.h>
@@ -6,45 +6,45 @@
 #include <fstream>
 #include <iostream>
 
-
 #include <ThreadPool.h>
 
 #pragma comment(lib, "shlwapi.lib")
 
 extern long g_cDllRef;
 
-ShellExtComponent::ShellExtComponent() : m_cRef(1)
+ContextMenuComponent::ContextMenuComponent() : m_cRef(1)
 {
     InterlockedIncrement(&g_cDllRef);
 }
 
-ShellExtComponent::~ShellExtComponent()
+ContextMenuComponent::~ContextMenuComponent()
 {
+	m_files.clear();
     InterlockedDecrement(&g_cDllRef);
 }
 
 #pragma region IUnknown
 
 // Query to the interface the component supported.
-IFACEMETHODIMP ShellExtComponent::QueryInterface(REFIID riid, void **ppv)
+IFACEMETHODIMP ContextMenuComponent::QueryInterface(REFIID riid, void **ppv)
 {
     static const QITAB qit[] = 
     {
-        QITABENT(ShellExtComponent, IShellExtInit), 
-		QITABENT(ShellExtComponent, IContextMenu),
+        QITABENT(ContextMenuComponent, IShellExtInit), 
+		QITABENT(ContextMenuComponent, IContextMenu),
         { 0 },
     };
     return QISearch(this, qit, riid, ppv);
 }
 
 // Increase the reference count for an interface on an object.
-IFACEMETHODIMP_(ULONG) ShellExtComponent::AddRef()
+IFACEMETHODIMP_(ULONG) ContextMenuComponent::AddRef()
 {
     return InterlockedIncrement(&m_cRef);
 }
 
 // Decrease the reference count for an interface on an object.
-IFACEMETHODIMP_(ULONG) ShellExtComponent::Release()
+IFACEMETHODIMP_(ULONG) ContextMenuComponent::Release()
 {
     ULONG cRef = InterlockedDecrement(&m_cRef);
     if (0 == cRef)
@@ -60,7 +60,7 @@ IFACEMETHODIMP_(ULONG) ShellExtComponent::Release()
 #pragma region IShellExtInit
 
 // Initialize the context menu extension.
-IFACEMETHODIMP ShellExtComponent::Initialize(
+IFACEMETHODIMP ContextMenuComponent::Initialize(
     LPCITEMIDLIST pidlFolder, LPDATAOBJECT pDataObj, HKEY hKeyProgID)
 {
     if (NULL == pDataObj)
@@ -83,21 +83,18 @@ IFACEMETHODIMP ShellExtComponent::Initialize(
             UINT nFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
 			for (UINT i = 0; i < nFiles;  i++)
 			{
-				try
+				wchar_t tmpPath[MAX_PATH + 1] = { '\0' };
+				if (0 != DragQueryFile(hDrop, i, tmpPath, ARRAYSIZE(tmpPath)))
 				{
-					std::shared_ptr<wchar_t> filePath(new wchar_t[MAX_PATH], deleter<wchar_t>());
-					DragQueryFile(hDrop, i, filePath.get(), 
-									MAX_PATH);
-
-					m_filesVec.push_back(FilePtr(new File(filePath.get())));
+					//Skip directories
+					std::wstring curPath(tmpPath);
+					if (!PathIsDirectoryW(curPath.c_str()))
+					{
+						m_files.push_back(std::wstring(tmpPath));
+						hr = S_OK;
+					}
 				}
-				catch (const std::exception& e)
-				{
-					std::cerr << "ShellExtComponent::Initialize " << e.what() << std::endl;
-				}
-
 			}
-			hr = S_OK;
 
             GlobalUnlock(stm.hGlobal);
         }
@@ -113,7 +110,7 @@ IFACEMETHODIMP ShellExtComponent::Initialize(
 #pragma region IContextMenu
 #define IDM_DISPLAY 0
 
-IFACEMETHODIMP ShellExtComponent::QueryContextMenu( 
+IFACEMETHODIMP ContextMenuComponent::QueryContextMenu( 
             _In_  HMENU hMenu,
             _In_  UINT indexMenu,
             _In_  UINT idCmdFirst,
@@ -126,7 +123,7 @@ IFACEMETHODIMP ShellExtComponent::QueryContextMenu(
                    indexMenu, 
                    MF_STRING | MF_BYPOSITION, 
                    idCmdFirst + IDM_DISPLAY, 
-                   L"&Log it!");
+				   kContextMenuItemName);
 
         return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(IDM_DISPLAY + 1));
     }
@@ -134,25 +131,16 @@ IFACEMETHODIMP ShellExtComponent::QueryContextMenu(
 	return S_OK;
 }
 
-IFACEMETHODIMP ShellExtComponent::InvokeCommand( 
+IFACEMETHODIMP ContextMenuComponent::InvokeCommand( 
             CMINVOKECOMMANDINFO *pici)
 {
-
-	ThreadPool tp(ThreadPool::THREAD_NUMBER);
-	for(auto& it : m_filesVec)
-	{
-		tp.enqueue(&File::LogInfo, it.get());
-	}
-
-	std::wstring str(L"Logging, file count: ");
-	str.append(std::to_wstring(m_filesVec.size()));
-	MessageBox(NULL, str.c_str(), L"Logging", 0);
-	tp.GetResult();
+	//We have single command to execute
+	HandleLogCommand();
 
 	return S_OK;
 }
 
-IFACEMETHODIMP ShellExtComponent::GetCommandString( 
+IFACEMETHODIMP ContextMenuComponent::GetCommandString( 
 			UINT_PTR idCmd,
 			UINT uType,
 			UINT *pReserved,
@@ -161,6 +149,21 @@ IFACEMETHODIMP ShellExtComponent::GetCommandString(
 {
 
 	return S_OK;
+}
+
+int ContextMenuComponent::HandleLogCommand()
+{
+	//ThreadPool tp(ThreadPool::THREAD_NUMBER);
+	//for (auto& it : m_files)
+	//{
+	//	tp.enqueue(&File::LogInfo, it);
+	//}
+
+	//std::wstring str(L"Logging, file count: ");
+	//str.append(std::to_wstring(m_files.size()));
+	//MessageBox(NULL, str.c_str(), L"Logging", 0);
+	//tp.GetResult();
+	return 0;
 }
 
 #pragma endregion

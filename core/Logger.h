@@ -1,12 +1,14 @@
 #pragma once
 
-#include <mutex>
 #include <atomic>
-#include <string>
-#include <File.h>
 #include <fstream>
+#include <mutex>
+#include <string>
 
-static const std::string k_logPath = "E:\\log.txt";
+#include <File.h>
+
+
+static const std::string k_logPath = "D:\\log.txt";
 
 class Logger
 {

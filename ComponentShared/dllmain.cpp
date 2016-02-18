@@ -3,6 +3,7 @@
 #include <Guiddef.h>
 #include "ClassFactory.h"
 #include "Reg.h"
+#include <new>
 
 // {54CC42E8-36FC-4B6D-B844-866CB089EB80}
 static const CLSID CLSID_ShellExt = 
@@ -52,7 +53,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void **ppv)
     {
         hr = E_OUTOFMEMORY;
 
-        ClassFactory *pClassFactory = new ClassFactory();
+		ClassFactory *pClassFactory = new (std::nothrow) ClassFactory();
         if (pClassFactory)
         {
             hr = pClassFactory->QueryInterface(riid, ppv);
@@ -94,7 +95,7 @@ STDAPI DllRegisterServer(void)
 
     // Register the component.
     hr = RegisterInprocServer(szModule, CLSID_ShellExt, 
-        L"CppShellExtProp.ShellExtComponent Class", 
+        L"CppShellExtProp.ContextMenuComponent Class", 
         L"Apartment");
     if (SUCCEEDED(hr))
     {
@@ -102,7 +103,7 @@ STDAPI DllRegisterServer(void)
         // associated with the * file class.
         hr = RegisterShellExt(L"*", 
 			CLSID_ShellExt, 
-            L"CppShellExtProp.ShellExtComponent");
+            L"CppShellExtProp.ContextMenuComponent");
     }
 
     return hr;
