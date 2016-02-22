@@ -1,5 +1,7 @@
 #include "ThreadPool.h"
 
+static unsigned int kDefaultThreads = 2;
+
 void ThreadPool::Worker::operator()()
 {
 	std::function<unsigned long()> task;
@@ -25,11 +27,19 @@ void ThreadPool::Worker::operator()()
 	}
 }
 
-ThreadPool::ThreadPool(size_t threads)
-	: m_stop(false)
+ThreadPool::ThreadPool()
+	: m_hardwareThreads(0)
+	, m_stop(false)
 	, m_result(0)
 {
-	for (size_t i = 0; i < threads; ++i)
+	// We will spawn n-1 threads for our threadpool
+	m_hardwareThreads = std::thread::hardware_concurrency() - 1;
+	if (0 == m_hardwareThreads)
+	{
+		// We failed to get correct hardware concurency.
+		m_hardwareThreads = kDefaultThreads;
+	}
+	for (size_t i = 0; i < m_hardwareThreads; ++i)
 		m_workers.push_back(std::thread(Worker(*this)));
 }
 
