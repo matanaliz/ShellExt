@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 
 class FileImpl;
 class File
@@ -16,5 +17,5 @@ public:
 	const std::wstring& Path() const;
 
 private:
-	FileImpl* m_impl;
+	std::unique_ptr<FileImpl> m_impl;
 };

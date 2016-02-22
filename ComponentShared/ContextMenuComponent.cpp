@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 
+#include <MainApp.h>
 #include <ThreadPool.h>
 
 #pragma comment(lib, "shlwapi.lib")
@@ -153,16 +154,7 @@ IFACEMETHODIMP ContextMenuComponent::GetCommandString(
 
 int ContextMenuComponent::HandleLogCommand()
 {
-	//ThreadPool tp(ThreadPool::THREAD_NUMBER);
-	//for (auto& it : m_files)
-	//{
-	//	tp.enqueue(&File::LogInfo, it);
-	//}
-
-	//std::wstring str(L"Logging, file count: ");
-	//str.append(std::to_wstring(m_files.size()));
-	//MessageBox(NULL, str.c_str(), L"Logging", 0);
-	//tp.GetResult();
+	MainApp app(m_files);
 	return 0;
 }
 

@@ -8,6 +8,9 @@ public:
 	FileImpl(const std::wstring& path);
 	~FileImpl();
 
+	FileImpl(FileImpl&) = delete;
+
+
 	unsigned long LogInfo();
 
 	const std::wstring& Date() const { return m_fileDate; }

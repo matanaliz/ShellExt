@@ -1,18 +1,19 @@
 #include <File.h>
 #include <FileImpl.h>
-#include <memory>
 #include <iostream>
+#include <memory>
 
-File::File(const std::wstring& path) : m_impl(0)
+File::File(const std::wstring& path) 
+	: m_impl(std::make_unique<FileImpl>(path))
 {
-	try
-	{
-		m_impl = new FileImpl(path);
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << "File::File() " << e.what() << std::endl;
-	}
+	//try
+	//{
+	//	m_impl = new FileImpl(path);
+	//}
+	//catch (const std::exception& e)
+	//{
+	//	std::cerr << "File::File() " << e.what() << std::endl;
+	//}
 }
 
 unsigned long File::LogInfo()
@@ -22,7 +23,7 @@ unsigned long File::LogInfo()
 
 File::~File()
 {
-	delete m_impl;
+
 }
 
 const std::wstring& File::Date() const
