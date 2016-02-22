@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <MainApp.h>
+#include <ThreadPool.h>
 
 int main(int argc, char** argv)
 {
@@ -10,8 +11,21 @@ int main(int argc, char** argv)
 	return RUN_ALL_TESTS();
 }
 
-TEST(testMainApp, myTest)
+TEST(testFile, basicFileTest)
 {
-	ASSERT_EQ(true, true);
+	// Make test to fail
+	ASSERT_TRUE(false);
+}
+
+TEST(testThreadPool, basicThreadPoolTest)
+{
+	// Make test to fail
+	ASSERT_TRUE(false);
+}
+
+TEST(testMainApp, basicTest)
+{
+	// Make test to fail
+	ASSERT_TRUE(false);
 }
 
