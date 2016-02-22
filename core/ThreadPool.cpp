@@ -29,6 +29,7 @@ void ThreadPool::Worker::operator()()
 
 ThreadPool::ThreadPool()
 	: m_hardwareThreads(0)
+	, m_queue()
 	, m_stop(false)
 	, m_result(0)
 {

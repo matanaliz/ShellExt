@@ -11,7 +11,7 @@ class MainApp
 {
 public:
 	MainApp(const fileVector&);
-	~MainApp();
+	~MainApp() = default;
 
 	MainApp() = delete;
 	MainApp(MainApp&) = delete;

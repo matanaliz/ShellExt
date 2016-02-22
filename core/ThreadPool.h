@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <vector>
 #include <deque>
+#include <memory>
 
 #include <queue>
 
@@ -12,8 +13,8 @@ template<typename T>
 class ThreadsafeQueue
 {
 public:
-	ThreadsafeQueue();
-	~ThreadsafeQueue();
+	ThreadsafeQueue() = default;
+	~ThreadsafeQueue() = default;
 
 	ThreadsafeQueue(const ThreadsafeQueue& other)
 	{
@@ -82,7 +83,7 @@ class WorkerThread
 {
 public:
 	WorkerThread();
-	~WorkerThread();
+	~WorkerThread() = default;
 
 	WorkerThread(WorkerThread&) = delete;
 	WorkerThread& operator=(const WorkerThread&) = delete;
@@ -101,7 +102,7 @@ public:
 	ThreadPool();
 	~ThreadPool();
 
-	ThreadPool(ThreadPool&) = delete;
+	ThreadPool(const ThreadPool&) = delete;
 	ThreadPool& operator=(const ThreadPool&) = delete;
 
 
