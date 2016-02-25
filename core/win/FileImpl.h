@@ -9,26 +9,18 @@ public:
 	~FileImpl();
 
 	FileImpl(FileImpl&) = delete;
+	FileImpl& operator=(const FileImpl&) = delete;
 
+	unsigned long long computeSum();
 
-	unsigned long LogInfo();
-
-	const std::wstring& Date() const { return m_fileDate; }
-	const std::wstring& Size() const { return m_fileSize; }
-	const std::wstring& Name() const { return m_fileName; }
-	const std::wstring& Path() const { return m_filePath; }
+	const std::wstring&			Date();
+	const unsigned long long	Size();
+	const unsigned long long	SizeKb();
+	const std::wstring&			Path();
 
 private:
-
-	void prepareInfo();
-	unsigned long computeSum();
-	unsigned long computeSumBuf(const unsigned char* buf, size_t size);
-
-	std::wstring m_filePath;
-	std::wstring m_fileDate;
-	std::wstring m_fileSize;
-	std::wstring m_fileName;
-
-	HANDLE m_fileHandle;
-
+	std::wstring m_path;
+	std::wstring m_date;
+	unsigned long long m_size;
+	unsigned long long m_sizeKb;
 };

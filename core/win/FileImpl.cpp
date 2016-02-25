@@ -6,113 +6,142 @@
 
 
 FileImpl::FileImpl(const std::wstring& path) 
-	: m_filePath(path)
-	, m_fileDate(L"")
-	, m_fileSize(L"")
-	, m_fileName(L"")
+	: m_path(path)
+	, m_date(L"")
+	, m_size(0)
+	, m_sizeKb(0)
 {
-	prepareInfo();
 }
 
 FileImpl::~FileImpl()
 {
 }
 
-unsigned long FileImpl::computeSum()
+unsigned long long FileImpl::computeSum()
 {
-	//Probably, I need to use WINAPI for asyc file reading
-	unsigned long sum = 0;
-	std::fstream fstr;
-	fstr.open(m_filePath.c_str(), std::fstream::in | std::fstream::binary);
-	if (fstr.is_open())
+	unsigned long long sum = 0;
+	std::ifstream fstr;
+	try
 	{
-		while (!fstr.eof() && fstr.good())
+		fstr.open(m_path.c_str(), std::fstream::in | std::fstream::binary);
+		if (fstr.is_open())
 		{
-			char c;
-			fstr.get(c);
-			sum += static_cast<unsigned long>(c);
+			while (!fstr.eof() && fstr.good())
+			{
+				// Possible overflow. Change checksum to some other.
+				char c;
+				fstr.get(c);
+				sum += static_cast<unsigned long>(c);
+			}
+			fstr.close();
 		}
-		fstr.close();
+	}
+	catch (...)
+	{
+		// TODO Log exceptions with logger all over the project.
 	}
 
 	return sum;
 }
 
-unsigned long FileImpl::computeSumBuf(const unsigned char* buf, size_t size)
+//unsigned long FileImpl::LogInfo()
+//{
+//	std::wstringstream wss;
+//	std::wstring spc(L"\t");
+//	wss.write(m_filePath.c_str(), m_filePath.size());
+//	wss.write(spc.c_str(), spc.size());
+//	wss.write(m_fileDate.c_str(), m_fileDate.size());
+//	wss.write(spc.c_str(), spc.size());
+//	wss.write(m_fileSize.c_str(), m_fileSize.size());
+//	wss.write(spc.c_str(), spc.size());
+//
+//	//Sum count thread pool test
+//	//TODO: opend file by parts and feed to computeSumBuf
+//
+//	//ThreadPool check
+//	//ThreadPool tp(ThreadPool::THREAD_NUMBER);
+//	//unsigned char a[3] = { 0, 1, 2 };
+//	//tp.enqueue(&FileImpl::computeSumBuf, this, &a[0], 3);
+//	//tp.GetResult();
+//
+//	//computeSum is way too slow
+//	wss << std::to_wstring(computeSum());
+//	Logger::GetInstance()->LogIt(wss.str());
+//
+//	return 0;
+//}
+
+const std::wstring& FileImpl::Date()
 {
-	unsigned long sum = 0;
-	for (size_t i = 0; i < size; ++i)
-		sum += *buf++;
-	return sum;
-}
-
-unsigned long FileImpl::LogInfo()
-{
-	std::wstringstream wss;
-	std::wstring spc(L"\t");
-	wss.write(m_filePath.c_str(), m_filePath.size());
-	wss.write(spc.c_str(), spc.size());
-	wss.write(m_fileDate.c_str(), m_fileDate.size());
-	wss.write(spc.c_str(), spc.size());
-	wss.write(m_fileSize.c_str(), m_fileSize.size());
-	wss.write(spc.c_str(), spc.size());
-
-	//Sum count thread pool test
-	//TODO: opend file by parts and feed to computeSumBuf
-
-	//ThreadPool check
-	//ThreadPool tp(ThreadPool::THREAD_NUMBER);
-	//unsigned char a[3] = { 0, 1, 2 };
-	//tp.enqueue(&FileImpl::computeSumBuf, this, &a[0], 3);
-	//tp.GetResult();
-
-	//computeSum is way too slow
-	wss << std::to_wstring(computeSum());
-	Logger::GetInstance()->LogIt(wss.str());
-
-	return 0;
-}
-
-void FileImpl::prepareInfo()
-{
-	//TODO: check for result
-	WIN32_FILE_ATTRIBUTE_DATA lpFileInformation;
-	BOOL res = GetFileAttributesEx(m_filePath.c_str(), GET_FILEEX_INFO_LEVELS::GetFileExInfoStandard, &lpFileInformation);
-	if (0 == res)
+	if (m_date.empty())
 	{
-		MessageBox(NULL, std::to_wstring(GetLastError()).c_str(), L"GetFileAttributesEx Error", 0);
+		WIN32_FILE_ATTRIBUTE_DATA fileInformation;
+		if (0 != GetFileAttributesEx(
+			m_path.c_str(),
+			GET_FILEEX_INFO_LEVELS::GetFileExInfoStandard,
+			&fileInformation))
+		{
+			SYSTEMTIME lSystemTime;
+			FILETIME ftCreationTime = fileInformation.ftCreationTime;
+			if (0 != FileTimeToSystemTime(&ftCreationTime, &lSystemTime))
+			{
+				wchar_t tmpDate[MAX_PATH + 1] = { '\0' };
+				if (0 != GetDateFormat(
+					LOCALE_USER_DEFAULT,
+					NULL,
+					&lSystemTime,
+					L"dd'.'MM'.'yyyy",
+					tmpDate, ARRAYSIZE(tmpDate)))
+				{
+					std::wstringstream wss;
+					wss << tmpDate;
+					wchar_t tmpTime[MAX_PATH + 1] = { '\0' };
+					if (0 != GetTimeFormatEx(
+						LOCALE_NAME_USER_DEFAULT, 
+						TIME_FORCE24HOURFORMAT, 
+						&lSystemTime, 
+						L"HH:mm:ss", 
+						tmpTime, 
+						ARRAYSIZE(tmpTime)))
+					{
+						wss << tmpTime;
+					}
+					m_date = wss.str();
+				}
+			}
+		}
 	}
 
-	ULONGLONG fileSize = (static_cast<ULONGLONG>(lpFileInformation.nFileSizeHigh) <<
-                      sizeof(lpFileInformation.nFileSizeLow) * 8) |
-                     lpFileInformation.nFileSizeLow;
-	ULONGLONG fileSizeKB = (fileSize / 1024) == 0 ? 1 : fileSize / 1024;
-	m_fileSize = std::to_wstring(fileSizeKB);
-	m_fileSize.append(L" KB");
-	
-	SYSTEMTIME lSystemTime;
-	FILETIME ftCreationTime = lpFileInformation.ftCreationTime;
-	res = FileTimeToSystemTime(&ftCreationTime, &lSystemTime);
-	if (0 == res)
-	{
-		MessageBox(NULL, std::to_wstring(GetLastError()).c_str(), L"FileTimeToSystemTime Error", 0);
-	}
-
-
-	std::wstring date;
-	date.resize(20, 0);
-	res = GetDateFormat(LOCALE_USER_DEFAULT, NULL, &lSystemTime, L"dd'.'MM'.'yyyy", &date[0], 20);
-	if (0 == res)
-	{
-		MessageBox(NULL, std::to_wstring(GetLastError()).c_str(), L"GetDateFormat Error", 0);
-	}
-
-	std::wstring time;
-	time.resize(10, 0);
-	res = GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, TIME_FORCE24HOURFORMAT, &lSystemTime, L"HH:mm:ss", &time[0], 10);
-	std::wstringstream wss;
-	wss.unsetf(std::wstringstream::skipws);
-	wss << std::noskipws << date << time;
-	m_fileDate.swap(wss.str());
+	return m_date;
 }
 
+const std::wstring& FileImpl::Path()
+{
+	return m_path;
+}
+
+const unsigned long long FileImpl::Size()
+{
+	if (0 == m_size)
+	{
+		WIN32_FILE_ATTRIBUTE_DATA fileInformation;
+		if (0 != GetFileAttributesEx(m_path.c_str(),
+			GET_FILEEX_INFO_LEVELS::GetFileExInfoStandard,
+			&fileInformation))
+		{
+			m_size = (static_cast<ULONGLONG>(fileInformation.nFileSizeHigh) <<
+				sizeof(fileInformation.nFileSizeLow) * 8) |
+				fileInformation.nFileSizeLow;
+			m_sizeKb = (m_size / 1024) == 0 ? 1 : m_size / 1024;
+		}
+	}
+	return m_size;
+}
+
+const unsigned long long FileImpl::SizeKb()
+{
+	if (0 == m_size)
+		Size();
+
+	return m_sizeKb;
+}
