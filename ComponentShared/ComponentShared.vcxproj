@@ -62,8 +62,13 @@
       <ModuleDefinitionFile>GlobalExportFunctions.def</ModuleDefinitionFile>
     </Link>
     <PreBuildEvent>
-      <Command>Regsvr32 -u $(OutDir)$(TargetName)$(TargetExt)</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>lib /NOLOGO /OUT:"$(ProjectName).lib" "$(ProjectDir)\$(Configuration)\*.obj"</Command>
+      <Message>Creating static library containing all .obj files for gtest</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -83,6 +88,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>GlobalExportFunctions.def</ModuleDefinitionFile>
     </Link>
+    <PostBuildEvent>
+      <Command>lib /NOLOGO /OUT:"$(ProjectName).lib" "$(ProjectDir)\$(Configuration)\*.obj"</Command>
+      <Message>Creating static library containing all .obj files for gtest</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\core\File.h" />

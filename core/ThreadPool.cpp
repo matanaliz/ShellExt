@@ -2,10 +2,42 @@
 
 static unsigned int kDefaultThreads = 2;
 
+WorkerThread::WorkerThread(const std::shared_ptr<TaskQueue>& queue)
+	: m_thread(nullptr)
+	, m_queue(queue)
+	, m_run(false)
+{
+}
+
+WorkerThread::WorkerThread(WorkerThread&& other)
+	: m_thread(std::move(other.m_thread))
+	, m_queue(std::move(other.m_queue))
+	, m_run(other.m_run.load())
+{
+}
+
+WorkerThread::~WorkerThread()
+{
+	if (m_thread && m_thread->joinable()) 
+		m_thread->join();
+}
+
+void WorkerThread::start()
+{
+	m_run.store(true);
+	m_thread = std::move(std::make_unique<std::thread>(
+		std::thread(&WorkerThread::doWork, this)));
+}
+
+void WorkerThread::stop()
+{
+	m_run.store(false);
+}
+
 void WorkerThread::doWork()
 {
 	// This will be busy-wait. Should use wait_and_pop.
-	while (m_run.test_and_set())
+	while (m_run.load())
 	{
 		try
 		{

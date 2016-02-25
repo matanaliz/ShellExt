@@ -88,40 +88,24 @@ using TaskQueue = ThreadsafeQueue<std::function<void()>>;
 class WorkerThread
 {
 public:
-	WorkerThread(const std::shared_ptr<TaskQueue>& queue)
-		: m_thread(nullptr)
-		, m_queue(queue)
-		, m_run()
-	{
-		m_run.test_and_set();
-		// TODO move thread start to some start() method?
-		m_thread = std::move(std::make_unique<std::thread>(
-			std::thread(&WorkerThread::doWork, this)));
-	}
-
 	WorkerThread() = delete;
-	~WorkerThread() { if (m_thread && m_thread->joinable()) m_thread->join(); }
+	WorkerThread(const std::shared_ptr<TaskQueue>& queue);
+	// Visual studio cannot into default move ctor
+	WorkerThread(WorkerThread&& );
+	~WorkerThread();
 
 	WorkerThread(const WorkerThread&) = delete;
-
-	// To get vector of WorkerThread to work
-	WorkerThread(WorkerThread&& other)
-		: m_thread(std::move(other.m_thread))
-		, m_queue(std::move(other.m_queue))
-		, m_run()
-	{ };
-
+	WorkerThread& operator=(WorkerThread&&) = delete;
 	WorkerThread& operator=(const WorkerThread&) = delete;
 
-	void stop() { m_run.clear(); };
+	void start();
+	void stop();
 
 private:
 	void doWork();
 	std::unique_ptr<std::thread> m_thread;
 	std::shared_ptr<TaskQueue> m_queue;
-	// TODO change this to bool under mutex. Have problems with movector.
-	std::atomic_flag m_run;
-
+	std::atomic<bool> m_run;
 };
 
 class ThreadPool
