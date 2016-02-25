@@ -155,6 +155,7 @@ IFACEMETHODIMP ContextMenuComponent::GetCommandString(
 int ContextMenuComponent::HandleLogCommand()
 {
 	MainApp app(m_files);
+	app.Run();
 	return 0;
 }
 

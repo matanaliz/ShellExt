@@ -5,19 +5,21 @@
 #include <vector>
 #include <string>
 
-using fileVector = std::vector<std::wstring>;
+using FileVector = std::vector<std::wstring>;
 
 class MainApp
 {
 public:
-	MainApp(const fileVector&);
+	MainApp(const FileVector&);
 	~MainApp() = default;
 
 	MainApp() = delete;
 	MainApp(MainApp&) = delete;
 	MainApp& operator= (const MainApp&) = delete;
 
+	void Run();
+
 private:
-	fileVector m_files;
+	FileVector m_files;
 	ThreadPool m_threadPool;
 };
