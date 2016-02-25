@@ -6,42 +6,33 @@
 File::File(const std::wstring& path) 
 	: m_impl(std::make_unique<FileImpl>(path))
 {
-	//try
-	//{
-	//	m_impl = new FileImpl(path);
-	//}
-	//catch (const std::exception& e)
-	//{
-	//	std::cerr << "File::File() " << e.what() << std::endl;
-	//}
 }
 
-unsigned long File::LogInfo()
+unsigned long long File::GetCheckSum()
 {
-	return m_impl->LogInfo();
+	return m_impl ? m_impl->computeSum() : 0;
 }
 
 File::~File()
 {
-
 }
 
 const std::wstring& File::Date() const
 {
-	return m_impl->Date();
+	return m_impl ? m_impl->Date() : std::move(std::wstring());
 }
 
-const std::wstring& File::Size() const
+const unsigned long long File::Size() const
 {
-	return m_impl->Size();
+	return m_impl ? m_impl->Size() : 0;
 }
 
-const std::wstring& File::Name() const
+const unsigned long long File::SizeKb() const
 {
-	return m_impl->Name();
+	return m_impl ? m_impl->SizeKb() : 0;
 }
 
 const std::wstring& File::Path() const
 {
-	return m_impl->Path();
+	return m_impl ? m_impl->Path() : std::move(std::wstring());
 }
