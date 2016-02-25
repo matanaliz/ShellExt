@@ -1,13 +1,13 @@
 #pragma once
 
-#include <thread>
-#include <mutex>
+#include <atomic>
 #include <condition_variable>
-#include <vector>
 #include <deque>
+#include <thread>
 #include <memory>
-
+#include <mutex>
 #include <queue>
+#include <vector>
 
 template<typename T>
 class ThreadsafeQueue
@@ -21,7 +21,9 @@ public:
 		std::lock_guard<std::mutex> lk(other.m_mutex);
 		m_data = other.m_data;
 	}
+
 	ThreadsafeQueue& operator=(const ThreadsafeQueue&) = delete;
+	ThreadsafeQueue& operator=(const ThreadsafeQueue&&) = delete;
 
 	void push(T new_value)
 	{
@@ -73,26 +75,52 @@ public:
 		return m_data.empty();
 	}
 
+	typedef T type;
+
 private:
 	mutable std::mutex m_mutex;
 	std::condition_variable m_cond;
 	std::queue<T> m_data;
 };
 
+using TaskQueue = ThreadsafeQueue<std::function<void()>>;
+
 class WorkerThread
 {
 public:
-	WorkerThread();
-	~WorkerThread() = default;
+	WorkerThread(const std::shared_ptr<TaskQueue>& queue)
+		: m_thread(nullptr)
+		, m_queue(queue)
+		, m_run()
+	{
+		m_run.test_and_set();
+		// TODO move thread start to some start() method?
+		m_thread = std::move(std::make_unique<std::thread>(
+			std::thread(&WorkerThread::doWork, this)));
+	}
 
-	WorkerThread(WorkerThread&) = delete;
+	WorkerThread() = delete;
+	~WorkerThread() { if (m_thread && m_thread->joinable()) m_thread->join(); }
+
+	WorkerThread(const WorkerThread&) = delete;
+
+	// To get vector of WorkerThread to work
+	WorkerThread(WorkerThread&& other)
+		: m_thread(std::move(other.m_thread))
+		, m_queue(std::move(other.m_queue))
+		, m_run()
+	{ };
+
 	WorkerThread& operator=(const WorkerThread&) = delete;
 
-	void start();
-	void stop();
+	void stop() { m_run.clear(); };
 
 private:
-	
+	void doWork();
+	std::unique_ptr<std::thread> m_thread;
+	std::shared_ptr<TaskQueue> m_queue;
+	// TODO change this to bool under mutex. Have problems with movector.
+	std::atomic_flag m_run;
 
 };
 
@@ -133,8 +161,8 @@ public:
 private:
 
 	unsigned int m_hardwareThreads;
-	ThreadsafeQueue<std::function<void()>> m_queue;
-	std::vector<WorkerThread> m_threads; //Rename this shit
+	std::shared_ptr<TaskQueue> m_queue;
+	std::vector<std::shared_ptr<WorkerThread>> m_threads;
 
 	std::mutex m_mutex;
 	std::vector<std::thread> m_workers;
