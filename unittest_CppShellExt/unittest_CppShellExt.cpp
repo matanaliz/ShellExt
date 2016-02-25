@@ -4,11 +4,19 @@
 #include <gtest/gtest.h>
 #include <MainApp.h>
 #include <ThreadPool.h>
+#include <Logger.h>
 
 int main(int argc, char** argv)
 {
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
+}
+
+TEST(testFile, basicLoggerTest)
+{
+	// Failing to set empty path
+	//bool res = Logger::Instance()->SetLogFile("");
+	ASSERT_FALSE(res);
 }
 
 TEST(testFile, basicFileTest)

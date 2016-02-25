@@ -27,8 +27,7 @@ WorkerThread::~WorkerThread()
 void WorkerThread::start()
 {
 	m_run.store(true);
-	m_thread = std::move(std::make_unique<std::thread>(
-		std::thread(&WorkerThread::doWork, this)));
+	m_thread = std::make_unique<std::thread>(std::thread(&WorkerThread::doWork, this));
 }
 
 void WorkerThread::stop()

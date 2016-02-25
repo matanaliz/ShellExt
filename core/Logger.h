@@ -8,19 +8,20 @@
 #include <File.h>
 
 
-static const std::string k_logPath = "D:\\log.txt";
+static const std::string k_defaultLogPath = "C:\\default_log.txt";
 
 class Logger
 {
 public:
-	static Logger* GetInstance();
+	static Logger* Instance();
+	bool SetLogFile(const std::string& path);
+	void LogToFile(const std::wstring& wstr);
+	void LogToFile(const std::string& str);
 
-	void LogIt(const std::wstring& path);
 private:
 	Logger();
 	~Logger();
 
-	static std::atomic<Logger*> m_instance;
-	static std::mutex m_mutex;
-	std::wfstream m_logFile;
+	std::string m_currentPath;
+	std::mutex m_mutex;
 };

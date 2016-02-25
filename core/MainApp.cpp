@@ -13,6 +13,8 @@ MainApp::MainApp(const FileVector& files)
 
 void MainApp::Run()
 {
+	Logger::Instance()->SetLogFile("D:\\CppShellExtLog.txt");
+
 	for (const auto& path : m_files)
 	{
 		TaskQueue::type function_object(
@@ -27,7 +29,7 @@ void MainApp::Run()
 			wss << file.Date() << spc;
 			wss << sum << std::endl;
 
-			Logger::GetInstance()->LogIt(wss.str());
+			Logger::Instance()->LogToFile(wss.str());
 		});
 
 		m_threadPool.Enqueue(function_object);
