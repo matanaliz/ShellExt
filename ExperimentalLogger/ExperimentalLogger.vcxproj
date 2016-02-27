@@ -78,9 +78,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="backtrace.h" />
+    <ClInclude Include="backtrace_impl.h" />
+    <ClInclude Include="basiclogger.h" />
     <ClInclude Include="logg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="backtrace.cpp" />
+    <ClCompile Include="backtrace_impl.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
