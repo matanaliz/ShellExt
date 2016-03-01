@@ -8,7 +8,7 @@
 #include <File.h>
 
 
-static const std::string k_defaultLogPath = "C:\\default_log.txt";
+static const std::string k_defaultLogPath = "E:\\default_log.txt";
 
 class Logger
 {

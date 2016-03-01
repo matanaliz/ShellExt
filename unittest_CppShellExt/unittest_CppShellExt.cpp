@@ -12,10 +12,18 @@ int main(int argc, char** argv)
 	return RUN_ALL_TESTS();
 }
 
+TEST(testFile, basicLoggerEmptyFileTest)
+{
+	// Fail to set empty path
+	bool res = Logger::Instance()->SetLogFile("");
+	ASSERT_FALSE(res);
+}
+
 TEST(testFile, basicLoggerTest)
 {
-	// Failing to set empty path
-	//bool res = Logger::Instance()->SetLogFile("");
+	// Fail to set empty path
+	bool res = Logger::Instance()->SetLogFile("test.txt");
+	Logger::Instance()->LogToFile("test");
 	ASSERT_FALSE(res);
 }
 
